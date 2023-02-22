@@ -5,9 +5,11 @@ import com.example.coen6317assignmentak.service.AudioService;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static java.lang.System.out;
@@ -19,7 +21,6 @@ public class AudioController {
     AudioService service;
 
     ConcurrentHashMap<String, Audio> audioDB = new ConcurrentHashMap<>();
-
     @PostConstruct
     public void init() {
         Audio audio1 = new Audio("Shakira", "Waka Waka", "Waka Waka", 1, 2010,
@@ -36,20 +37,26 @@ public class AudioController {
     }
 
     @GetMapping(path = "/getAudio", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Async
     public Audio getAudio(@RequestParam String artistName) {
 
-        return service.fetchAudioDetails(artistName, audioDB);
+        Audio getAudioResponse = service.fetchAudioDetails(artistName, audioDB);
+        return getAudioResponse;
 
     }
 
     @GetMapping(path = "/getAllAudio", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Async
     public List<Audio> getAllAudio() {
 
-        return service.fetchAllAudioDetails(audioDB);
+        List<Audio> getAllAudioResponse = service.fetchAllAudioDetails(audioDB);
+        return getAllAudioResponse;
 
     }
 
     @PostMapping(path = "/createAudio")
+    @ResponseBody
+    @Async
     public String createAudio(@RequestBody Audio input) {
 
         String response = service.createAudioDetails(input,audioDB);
