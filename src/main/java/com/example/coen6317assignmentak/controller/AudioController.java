@@ -2,6 +2,8 @@ package com.example.coen6317assignmentak.controller;
 
 import com.example.coen6317assignmentak.model.Audio;
 import com.example.coen6317assignmentak.service.AudioService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -16,6 +18,7 @@ import static java.lang.System.out;
 
 @RestController
 @RequestMapping("/coen6317/audios")
+@Api(value =  "Audio API", protocols = "http")
 public class AudioController {
     @Autowired
     AudioService service;
@@ -36,6 +39,7 @@ public class AudioController {
 
     }
 
+    @ApiOperation(value = "To access a particular Audio details by passing artist name", response = Audio.class, code =200)
     @GetMapping(path = "/getAudio", produces = MediaType.APPLICATION_JSON_VALUE)
     @Async
     public Audio getAudio(@RequestParam String artistName) {
@@ -45,6 +49,7 @@ public class AudioController {
 
     }
 
+    @ApiOperation(value = "To access a particular Audio details by passing artist name", response = Audio.class, code =200)
     @GetMapping(path = "/getAllAudio", produces = MediaType.APPLICATION_JSON_VALUE)
     @Async
     public List<Audio> getAllAudio() {
@@ -54,6 +59,7 @@ public class AudioController {
 
     }
 
+    @ApiOperation(value = "To access a particular Audio details by passing artist name", response = Audio.class, code =200)
     @PostMapping(path = "/createAudio")
     @ResponseBody
     @Async
