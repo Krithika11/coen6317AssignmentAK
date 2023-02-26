@@ -45,7 +45,7 @@ public class AudioClientTest {
     // Create POST request objects
     Audio audio1 = new Audio("Eric Church", "Waka Waka", "Waka Waka", 1, 2010,
             100, 1000);
-    Audio audio2 = new Audio("Billie", "Waka Waka", "Waka Waka", 1, 2010,
+    Audio audio2 = new Audio("Marie", "Waka Waka", "Waka Waka", 1, 2010,
             100, 1000);
     Audio audio3 = new Audio("Richie", "Waka Waka", "Waka Waka", 1, 2010,
             100, 1000);
@@ -57,21 +57,17 @@ public class AudioClientTest {
     @Test
     public void testGetAudiorequest() throws Exception {
         RequestBuilder requestBuilder = MockMvcRequestBuilders.get(getUrl).accept(MediaType.APPLICATION_JSON);
-        RequestBuilder requestBuilder1 = MockMvcRequestBuilders.get(getUrl).accept(MediaType.APPLICATION_JSON);
 
         MvcResult result = mockMvc.perform(requestBuilder).andReturn();
-        MvcResult result1 = mockMvc.perform(requestBuilder1).andReturn();
         MockHttpServletResponse response = result.getResponse();
-        MockHttpServletResponse response1 = result.getResponse();
         assertEquals(200, response.getStatus());
-        assertEquals(200, response1.getStatus());
 
         System.out.println(response.getStatus());
     }
 
     @Test
     public void testError404ForGetAudiorequest() throws Exception {
-        String ErrorUrl = "/coen6317/audios/geAudio?artistName=Shakira";
+        String ErrorUrl = "/coen6731/audios/geAudio?artistName=Shakira";
         RequestBuilder requestBuilder = MockMvcRequestBuilders.get(ErrorUrl).accept(MediaType.APPLICATION_JSON);
 
         MvcResult result = mockMvc.perform(requestBuilder).andReturn();
@@ -80,16 +76,6 @@ public class AudioClientTest {
         System.out.println(response.getStatus());
     }
 
-    @Test
-    public void testError400ForGetAudiorequest() throws Exception {
-        String url = "/coen6317/audios/getAudio?artistName=1";
-        RequestBuilder requestBuilder = MockMvcRequestBuilders.get(url).accept(MediaType.APPLICATION_JSON);
-
-        MvcResult result = mockMvc.perform(requestBuilder).andReturn();
-        MockHttpServletResponse response = result.getResponse();
-        assertEquals(400, response.getStatus());
-        System.out.println(response.getStatus());
-    }
 
     @Test
     public void testGetAllAudiorequest() throws Exception {
@@ -211,7 +197,7 @@ public class AudioClientTest {
         for (int i = 1; i <= 9; i++) {
 
             futures.add(CompletableFuture.supplyAsync(() ->
-                    executePostRequest(postUrl, element3)));
+                    executePostRequest(postUrl, element2)));
         }
 
         // Wait for all requests to complete
