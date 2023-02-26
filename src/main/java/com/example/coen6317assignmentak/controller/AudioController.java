@@ -2,11 +2,11 @@ package com.example.coen6317assignmentak.controller;
 
 import com.example.coen6317assignmentak.model.Audio;
 import com.example.coen6317assignmentak.service.AudioService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,9 +17,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import static java.lang.System.out;
 
 @RestController
-@RequestMapping("/coen6317/audios")
-@Api(value =  "Audio API", protocols = "http")
+@RequestMapping("/coen6731/audios")
 public class AudioController {
+
     @Autowired
     AudioService service;
 
@@ -39,19 +39,16 @@ public class AudioController {
 
     }
 
-    @ApiOperation(value = "To access a particular Audio details by passing artist name", response = Audio.class, code =200)
-    @GetMapping(path = "/getAudio", produces = MediaType.APPLICATION_JSON_VALUE)
     @Async
-    public Audio getAudio(@RequestParam String artistName) {
+    @GetMapping(path = "/getAudio", produces = MediaType.APPLICATION_JSON_VALUE)
+    public CompletableFuture<ResponseEntity<Audio>> getAudio(@RequestParam String artistName) {
 
-        Audio getAudioResponse = service.fetchAudioDetails(artistName, audioDB);
-        return getAudioResponse;
+        return service.fetchAudioDetails(artistName, audioDB)
+                .thenApply(getResponse -> ResponseEntity.ok(getResponse));
 
     }
 
-    @ApiOperation(value = "To access a particular Audio details by passing artist name", response = Audio.class, code =200)
     @GetMapping(path = "/getAllAudio", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Async
     public List<Audio> getAllAudio() {
 
         List<Audio> getAllAudioResponse = service.fetchAllAudioDetails(audioDB);
@@ -59,13 +56,15 @@ public class AudioController {
 
     }
 
-    @ApiOperation(value = "To access a particular Audio details by passing artist name", response = Audio.class, code =200)
     @PostMapping(path = "/createAudio")
     @ResponseBody
-    @Async
+    @ResponseStatus(HttpStatus.CREATED)
     public String createAudio(@RequestBody Audio input) {
 
         String response = service.createAudioDetails(input,audioDB);
+
+        int sum = audioDB.values().stream().map(Audio::getCopiesSold).mapToInt(Integer::intValue).sum();
+        out.println("Total number of copies sold: " +sum);
         return response + " " + input.getArtistName();
 
     }
