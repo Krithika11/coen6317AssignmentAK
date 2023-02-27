@@ -23,10 +23,13 @@ public class AudioService {
             if (artistName.equals(null) || artistName.equals("null") || artistName.matches("^\\d+")
                     || artistName.isEmpty()) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Artist Name");
-            } else {
+            } else if(audioMap.containsKey(artistName)){
                     audio = audioMap.get(artistName);
                     System.out.println("GET RESPONSE IN JSON - single element: " + gson.toJson(audio));
                 }
+            else {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ArtistName not found");
+            }
             return audio;
             });
     }

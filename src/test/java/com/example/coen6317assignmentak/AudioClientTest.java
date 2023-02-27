@@ -24,10 +24,8 @@ import java.util.concurrent.*;
 
 import static org.junit.Assert.assertEquals;
 
-
 @SpringBootTest
 @Import(MockMvcConfig.class)
-
 
 public class AudioClientTest {
 
@@ -36,7 +34,6 @@ public class AudioClientTest {
 
     @Autowired
     private AudioController controller;
-
 
     String getUrl = "http://localhost:8080/coen6731/audios/getAudio?artistName=Shakira";
     String getAllUrl = "http://localhost:8080/coen6731/audios/getAllAudio";
@@ -79,7 +76,8 @@ public class AudioClientTest {
     @Test
     public void testPostAudioRequest() throws Exception {
         // Create POST request object
-        Audio audio1 = new Audio("Marie", "Waka Waka", "Waka Waka", 1, 2010,
+        Audio audio1 = new Audio("Marie", "Waka Waka",
+                "Waka Waka", 1, 2010,
                 100, 1000);
         Gson gson = new Gson();
         String element = gson.toJson(audio1);
@@ -107,22 +105,20 @@ public class AudioClientTest {
         // Create 3 GET requests
         for (int i = 1; i <= 3; i++) {
             futures.add(CompletableFuture.supplyAsync(() -> executeGetRequest(getUrl), executor));
-
         }
-
         // Create 3 POST request object
         for (int i = 1; i <= 3; i++) {
-            Audio audio1 = new Audio("Eric Church" + i, "Waka Waka", "Waka Waka", 1, 2010,
+            Audio audio1 = new Audio("Eric Church" + i, "Waka Waka",
+                    "Waka Waka", 1, 2010,
                     100, 1000);
             String element1 = gson.toJson(audio1);
             futures.add(CompletableFuture.supplyAsync(() ->
                     executePostRequest(postUrl, element1), executor));
         }
-
         // Wait for all requests to complete
-        CompletableFuture<Void> allFutures = CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]));
+        CompletableFuture<Void> allFutures = CompletableFuture.allOf(futures
+                .toArray(new CompletableFuture[futures.size()]));
         allFutures.join();
-
         // Iterate over the results
         for (CompletableFuture<ApiResponse> future : futures) {
             ApiResponse apiResponse = future.get();
@@ -131,7 +127,6 @@ public class AudioClientTest {
             System.out.println("Response: " + response);
             System.out.println("Duration: " + duration + " milliseconds");
         }
-
     }
 
     @Test
@@ -151,21 +146,20 @@ public class AudioClientTest {
                 return executeGetRequest(getUrl);
             },executor));
         }
-
         // Create 8 POST requests
         for (int i = 1; i <= 8; i++) {
             // Create POST request object
-            Audio audio2 = new Audio("Shakira" +i, "Waka Waka", "Waka Waka", 1, 2010,
+            Audio audio2 = new Audio("Shakira" +i, "Waka Waka",
+                    "Waka Waka", 1, 2010,
                     100, 1000);
             String element2 = gson.toJson(audio2);
             futures.add(CompletableFuture.supplyAsync(() ->
                     executePostRequest(postUrl, element2), executor));
         }
-
         // Wait for all requests to complete
-        CompletableFuture<Void> allFutures = CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]));
+        CompletableFuture<Void> allFutures = CompletableFuture.allOf(futures
+                .toArray(new CompletableFuture[futures.size()]));
         allFutures.join();
-
         // Iterate over the results
         for (CompletableFuture<ApiResponse> future : futures) {
             ApiResponse apiResponse = future.get();
@@ -190,21 +184,20 @@ public class AudioClientTest {
         for (int i = 1; i <= 45; i++) {
             futures.add(CompletableFuture.supplyAsync(() -> executeGetRequest(getUrl), executor));
         }
-
         // Create 9 POST requests
         for (int i = 1; i <= 9; i++) {
             // Create POST request object
-            Audio audio2 = new Audio("Ed Sheeran" + i, "Perfect", "Divide", 5, 2015,
+            Audio audio2 = new Audio("Ed Sheeran" + i,
+                    "Perfect", "Divide", 5, 2015,
                     200, 500 );
             String element2 = gson.toJson(audio2);
             futures.add(CompletableFuture.supplyAsync(() ->
                     executePostRequest(postUrl, element2), executor));
         }
-
         // Wait for all requests to complete
-        CompletableFuture<Void> allFutures = CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]));
+        CompletableFuture<Void> allFutures = CompletableFuture.allOf(futures
+                .toArray(new CompletableFuture[futures.size()]));
         allFutures.join();
-
         // Iterate over the results
         for (CompletableFuture<ApiResponse> future : futures) {
             ApiResponse apiResponse = future.get();
@@ -217,7 +210,6 @@ public class AudioClientTest {
 
     public static ApiResponse executeGetRequest(String url) {
         long startTime = System.currentTimeMillis();
-
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
         long duration = System.currentTimeMillis() - startTime;

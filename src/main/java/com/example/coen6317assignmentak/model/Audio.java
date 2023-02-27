@@ -12,7 +12,9 @@ public class Audio {
     public Audio() {
     }
 
-    public Audio(String artistName, String trackTitle, String albumTitle, Integer trackNumber, Integer year, Integer numberOfReviews, Integer copiesSold) {
+    public Audio(String artistName, String trackTitle, String albumTitle,
+                 Integer trackNumber, Integer year,
+                 Integer numberOfReviews, Integer copiesSold) {
         this.artistName = artistName;
         this.trackTitle = trackTitle;
         this.albumTitle = albumTitle;
