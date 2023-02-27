@@ -41,22 +41,11 @@ public class AudioClientTest {
     String getUrl = "http://localhost:8080/coen6731/audios/getAudio?artistName=Shakira";
     String getAllUrl = "http://localhost:8080/coen6731/audios/getAllAudio";
     String postUrl = "http://localhost:8080/coen6731/audios/createAudio";
-
-    // Create POST request objects
-    Audio audio1 = new Audio("Eric Church", "Waka Waka", "Waka Waka", 1, 2010,
-            100, 1000);
-    Audio audio2 = new Audio("Marie", "Waka Waka", "Waka Waka", 1, 2010,
-            100, 1000);
-    Audio audio3 = new Audio("Richie", "Waka Waka", "Waka Waka", 1, 2010,
-            100, 1000);
     Gson gson = new Gson();
-    String element1 = gson.toJson(audio1);
-    String element2 = gson.toJson(audio2);
-    String element3 = gson.toJson(audio3);
 
     @Test
     public void testGetAudiorequest() throws Exception {
-        RequestBuilder requestBuilder = MockMvcRequestBuilders.get(getUrl).accept(MediaType.APPLICATION_JSON);
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.get(getUrl);
 
         MvcResult result = mockMvc.perform(requestBuilder).andReturn();
         MockHttpServletResponse response = result.getResponse();
@@ -68,7 +57,7 @@ public class AudioClientTest {
     @Test
     public void testError404ForGetAudiorequest() throws Exception {
         String ErrorUrl = "/coen6731/audios/geAudio?artistName=Shakira";
-        RequestBuilder requestBuilder = MockMvcRequestBuilders.get(ErrorUrl).accept(MediaType.APPLICATION_JSON);
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.get(ErrorUrl);
 
         MvcResult result = mockMvc.perform(requestBuilder).andReturn();
         MockHttpServletResponse response = result.getResponse();
@@ -78,8 +67,8 @@ public class AudioClientTest {
 
 
     @Test
-    public void testGetAllAudiorequest() throws Exception {
-        RequestBuilder requestBuilder = MockMvcRequestBuilders.get(getAllUrl).accept(MediaType.APPLICATION_JSON);
+    public void testGetAllAudioRequest() throws Exception {
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.get(getAllUrl);
         MvcResult result = mockMvc.perform(requestBuilder).andReturn();
         MockHttpServletResponse response = result.getResponse();
         assertEquals(200, response.getStatus());
@@ -89,7 +78,8 @@ public class AudioClientTest {
 
     @Test
     public void testPostAudioRequest() throws Exception {
-        Audio audio1 = new Audio("Eric Church", "Waka Waka", "Waka Waka", 1, 2010,
+        // Create POST request object
+        Audio audio1 = new Audio("Marie", "Waka Waka", "Waka Waka", 1, 2010,
                 100, 1000);
         Gson gson = new Gson();
         String element = gson.toJson(audio1);
@@ -108,24 +98,26 @@ public class AudioClientTest {
     @Test
     public void testConcurrencyWithNineClients() throws ExecutionException, InterruptedException {
         List<CompletableFuture<ApiResponse>> futures = new ArrayList<>();
+        Executor executor = Executors.newFixedThreadPool(9);
 
-        // Create 20 GET requests
+        // Create 3 GET requests
         for (int i = 1; i <= 3; i++) {
-            futures.add(CompletableFuture.supplyAsync(() -> {
-                return executeGetRequest(getAllUrl);
-            }));
+            futures.add(CompletableFuture.supplyAsync(() -> executeGetRequest(getAllUrl), executor));
         }
-        // Create 20 GET requests
+        // Create 3 GET requests
         for (int i = 1; i <= 3; i++) {
-            futures.add(CompletableFuture.supplyAsync(() -> executeGetRequest(getUrl)));
+            futures.add(CompletableFuture.supplyAsync(() -> executeGetRequest(getUrl), executor));
+
         }
 
+        // Create 3 POST request object
+        for (int i = 1; i <= 3; i++) {
+            Audio audio1 = new Audio("Eric Church" + i, "Waka Waka", "Waka Waka", 1, 2010,
+                    100, 1000);
+            String element1 = gson.toJson(audio1);
             futures.add(CompletableFuture.supplyAsync(() ->
-                    executePostRequest(postUrl, element1)));
-            futures.add(CompletableFuture.supplyAsync(() ->
-                    executePostRequest(postUrl, element2)));
-            futures.add(CompletableFuture.supplyAsync(() ->
-                    executePostRequest(postUrl, element3)));
+                    executePostRequest(postUrl, element1), executor));
+        }
 
         // Wait for all requests to complete
         CompletableFuture<Void> allFutures = CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]));
@@ -145,22 +137,29 @@ public class AudioClientTest {
     @Test
     public void testConcurrencyWithFiftyClients() throws ExecutionException, InterruptedException {
         List<CompletableFuture<ApiResponse>> futures = new ArrayList<>();
+        Executor executor = Executors.newFixedThreadPool(48);
 
         // Create 20 GET requests
         for (int i = 1; i <= 20; i++) {
             futures.add(CompletableFuture.supplyAsync(() -> {
                 return executeGetRequest(getAllUrl);
-            }));
+            }, executor));
         }
         // Create 20 GET requests
         for (int i = 1; i <= 20; i++) {
-            futures.add(CompletableFuture.supplyAsync(() -> executeGetRequest(getUrl)));
+            futures.add(CompletableFuture.supplyAsync(() -> {
+                return executeGetRequest(getUrl);
+            },executor));
         }
 
         // Create 8 POST requests
         for (int i = 1; i <= 8; i++) {
+            // Create POST request object
+            Audio audio2 = new Audio("Shakira" +i, "Waka Waka", "Waka Waka", 1, 2010,
+                    100, 1000);
+            String element2 = gson.toJson(audio2);
             futures.add(CompletableFuture.supplyAsync(() ->
-                    executePostRequest(postUrl, element3)));
+                    executePostRequest(postUrl, element2), executor));
         }
 
         // Wait for all requests to complete
@@ -181,23 +180,25 @@ public class AudioClientTest {
     @Test
     public void testConcurrencyWithHundredClients() throws ExecutionException, InterruptedException {
         List<CompletableFuture<ApiResponse>> futures = new ArrayList<>();
+        Executor executor = Executors.newFixedThreadPool(99);
 
         // Create 45 GET requests
         for (int i = 1; i <= 45; i++) {
-            futures.add(CompletableFuture.supplyAsync(() -> {
-                return executeGetRequest(getAllUrl);
-            }));
+            futures.add(CompletableFuture.supplyAsync(() -> executeGetRequest(getAllUrl),executor));
         }
         // Create 45 GET requests
         for (int i = 1; i <= 45; i++) {
-            futures.add(CompletableFuture.supplyAsync(() -> executeGetRequest(getUrl)));
+            futures.add(CompletableFuture.supplyAsync(() -> executeGetRequest(getUrl), executor));
         }
 
         // Create 9 POST requests
         for (int i = 1; i <= 9; i++) {
-
+            // Create POST request object
+            Audio audio2 = new Audio("Ed Sheeran" + i, "Perfect", "Divide", 5, 2015,
+                    200, 500 );
+            String element2 = gson.toJson(audio2);
             futures.add(CompletableFuture.supplyAsync(() ->
-                    executePostRequest(postUrl, element2)));
+                    executePostRequest(postUrl, element2), executor));
         }
 
         // Wait for all requests to complete
@@ -212,7 +213,6 @@ public class AudioClientTest {
             System.out.println("Response: " + response);
             System.out.println("Duration: " + duration + " milliseconds");
         }
-
     }
 
     public static ApiResponse executeGetRequest(String url) {

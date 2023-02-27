@@ -56,7 +56,7 @@ public class AudioController {
 
     }
 
-    @PostMapping(path = "/createAudio")
+    @PostMapping(path = "/createAudio", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @ResponseStatus(HttpStatus.CREATED)
     public String createAudio(@RequestBody Audio input) {
